@@ -5,7 +5,7 @@
 Centralized cross-section table and metadata for CMS Monte Carlo samples.  
 **Campaign**: RunIISummer20UL17 NanoAODv9 (2017 Ultra-Legacy)
 
-**Live table**: https://\<username\>.github.io/the-barn/
+**Live table**: https://junghyun-lee-physicist.github.io/the-xs-barn/
 
 ---
 
