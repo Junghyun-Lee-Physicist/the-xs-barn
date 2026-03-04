@@ -1,0 +1,15 @@
+# Build artifacts
+examples/cpp/bin/
+
+# nlohmann/json (downloaded by user)
+include/nlohmann/json.hpp
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Editor
+*.swp
+*~
+.vscode/
+.idea/

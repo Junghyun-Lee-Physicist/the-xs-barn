@@ -1,53 +1,50 @@
 # ============================================================
-#  CMS Sample DB — Standalone C++ Build
+#  The Barn — C++ Examples
 # ============================================================
 #  Prerequisites:
-#    1. g++ with C++17 support (GCC ≥ 7, Clang ≥ 5)
-#    2. nlohmann/json.hpp in include/nlohmann/
-#       → wget https://github.com/nlohmann/json/releases/download/v3.11.3/json.hpp \
-#              -O include/nlohmann/json.hpp
+#    nlohmann/json.hpp in ../../include/nlohmann/
+#    → wget https://github.com/nlohmann/json/releases/download/v3.11.3/json.hpp \
+#           -O ../../include/nlohmann/json.hpp
 #
 #  Usage:
-#    make              # build example
-#    make run          # build & run with default JSON path
-#    make clean        # remove build artifacts
+#    make              # build all examples
+#    make run          # build & run basic_usage
+#    make clean
 # ============================================================
 
 CXX       := g++
 CXXFLAGS  := -std=c++17 -O2 -Wall -Wextra -pedantic
-INCDIR    := include
-SRCDIR    := src
+INCDIR    := ../../include
 BINDIR    := bin
 
-SRCS      := $(wildcard $(SRCDIR)/*.cpp)
-TARGETS   := $(patsubst $(SRCDIR)/%.cpp,$(BINDIR)/%,$(SRCS))
+JSON_PATH ?= ../../data/samples_2017UL.json
 
-JSON_PATH ?= ../data/samples_2017UL.json
+SRCS      := $(wildcard *.cpp)
+TARGETS   := $(patsubst %.cpp,$(BINDIR)/%,$(SRCS))
 
-# ---- rules ----
-
-.PHONY: all run clean check-json
+.PHONY: all run clean check-deps
 
 all: $(TARGETS)
 
-$(BINDIR)/%: $(SRCDIR)/%.cpp $(INCDIR)/cms/sample_loader.h | $(BINDIR) check-json
+$(BINDIR)/%: %.cpp | $(BINDIR) check-deps
 	$(CXX) $(CXXFLAGS) -I$(INCDIR) $< -o $@
 
 $(BINDIR):
 	mkdir -p $(BINDIR)
 
 run: all
-	./$(BINDIR)/example $(JSON_PATH)
+	./$(BINDIR)/basic_usage $(JSON_PATH)
 
 clean:
 	rm -rf $(BINDIR)
 
-check-json:
+check-deps:
 	@if [ ! -f $(INCDIR)/nlohmann/json.hpp ]; then \
 		echo ""; \
-		echo "  ERROR: include/nlohmann/json.hpp not found!"; \
-		echo "  Run:  wget https://github.com/nlohmann/json/releases/download/v3.11.3/json.hpp \\"; \
-		echo "             -O include/nlohmann/json.hpp"; \
+		echo "  ERROR: nlohmann/json.hpp not found at $(INCDIR)/nlohmann/json.hpp"; \
+		echo "  Run:"; \
+		echo "    wget https://github.com/nlohmann/json/releases/download/v3.11.3/json.hpp \\"; \
+		echo "         -O $(INCDIR)/nlohmann/json.hpp"; \
 		echo ""; \
 		exit 1; \
 	fi
