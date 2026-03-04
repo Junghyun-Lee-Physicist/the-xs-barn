@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CMS MC Sample Database — 2017 UL</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:         #0c0e13;
+    --surface:    #14171e;
+    --surface-2:  #1a1e28;
+    --border:     #252a36;
+    --text:       #d4d8e3;
+    --text-dim:   #6b7280;
+    --accent:     #3b82f6;
+    --accent-dim: #1d4ed8;
+    --green:      #22c55e;
+    --amber:      #f59e0b;
+    --red:        #ef4444;
+    --mono:       'JetBrains Mono', monospace;
+    --sans:       'DM Sans', system-ui, sans-serif;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { font-size: 14px; }
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    line-height: 1.5;
+  }
+
+  /* ---- header ---- */
+  .header {
+    padding: 2.5rem 2rem 1.5rem;
+    max-width: 1600px;
+    margin: 0 auto;
+  }
+  .header h1 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, #60a5fa, #a78bfa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .header .sub {
+    color: var(--text-dim);
+    font-size: 0.85rem;
+    margin-top: 0.3rem;
+  }
+  .badge {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    padding: 0.15rem 0.5rem;
+    border-radius: 9999px;
+    margin-left: 0.6rem;
+    vertical-align: middle;
+  }
+  .badge-ok   { background: rgba(34,197,94,0.15);  color: var(--green); }
+  .badge-warn { background: rgba(245,158,11,0.15); color: var(--amber); }
+
+  /* ---- toolbar ---- */
+  .toolbar {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    flex-wrap: wrap;
+    padding: 0 2rem;
+    max-width: 1600px;
+    margin: 0 auto 1rem;
+  }
+  .search-box {
+    flex: 1;
+    min-width: 200px;
+    max-width: 420px;
+    position: relative;
+  }
+  .search-box svg {
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 16px;
+    color: var(--text-dim);
+  }
+  .search-box input {
+    width: 100%;
+    padding: 0.55rem 0.75rem 0.55rem 2.3rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .search-box input:focus { border-color: var(--accent); }
+  .search-box input::placeholder { color: var(--text-dim); }
+
+  .filter-btn {
+    padding: 0.5rem 1rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text-dim);
+    font-family: var(--sans);
+    font-size: 0.78rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .filter-btn:hover { border-color: var(--accent); color: var(--text); }
+  .filter-btn.active { background: var(--accent-dim); border-color: var(--accent); color: #fff; }
+
+  .stat {
+    margin-left: auto;
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--text-dim);
+  }
+
+  /* ---- table ---- */
+  .table-wrap {
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 0 2rem 3rem;
+    overflow-x: auto;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8rem;
+  }
+  thead th {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: var(--surface);
+    padding: 0.7rem 0.6rem;
+    text-align: left;
+    font-weight: 600;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-dim);
+    border-bottom: 2px solid var(--border);
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+    transition: color 0.15s;
+  }
+  thead th:hover { color: var(--accent); }
+  thead th .sort-arrow { margin-left: 0.3rem; opacity: 0.4; font-size: 0.65rem; }
+  thead th.sorted .sort-arrow { opacity: 1; color: var(--accent); }
+
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.12s;
+  }
+  tbody tr:hover { background: var(--surface-2); }
+  tbody td {
+    padding: 0.55rem 0.6rem;
+    vertical-align: top;
+    white-space: nowrap;
+  }
+
+  .col-name {
+    font-family: var(--mono);
+    font-weight: 600;
+    font-size: 0.75rem;
+    color: #93c5fd;
+    max-width: 340px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .col-das {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    color: var(--text-dim);
+    max-width: 500px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .col-num {
+    font-family: var(--mono);
+    text-align: right;
+  }
+  .col-xsec {
+    font-family: var(--mono);
+    font-weight: 600;
+    text-align: right;
+    color: var(--green);
+  }
+  .col-acc {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    text-align: center;
+  }
+  .col-ref {
+    font-size: 0.72rem;
+    text-align: center;
+  }
+  td.pending {
+    color: var(--text-dim);
+    font-style: italic;
+    font-weight: 400;
+  }
+
+  .comment-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+    background: rgba(59,130,246,0.15);
+    color: var(--accent);
+    font-size: 0.65rem;
+    cursor: help;
+    position: relative;
+  }
+  .comment-icon .tooltip {
+    display: none;
+    position: absolute;
+    bottom: calc(100% + 8px);
+    right: 0;
+    width: 320px;
+    padding: 0.6rem 0.8rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-family: var(--sans);
+    font-size: 0.72rem;
+    font-style: normal;
+    color: var(--text);
+    white-space: normal;
+    line-height: 1.5;
+    z-index: 100;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+  }
+  .comment-icon:hover .tooltip { display: block; }
+
+  /* ---- responsive ---- */
+  @media (max-width: 900px) {
+    .header, .toolbar, .table-wrap { padding-left: 1rem; padding-right: 1rem; }
+  }
+
+  /* ---- loading ---- */
+  .loading {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--text-dim);
+    font-family: var(--mono);
+  }
+  .loading .spinner {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin-bottom: 1rem;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>CMS MC Sample Database <span class="badge badge-ok" id="badge"></span></h1>
+  <p class="sub">RunIISummer20UL17 NanoAODv9 — Cross sections, DAS paths &amp; event counts</p>
+</div>
+
+<div class="toolbar">
+  <div class="search-box">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+    </svg>
+    <input type="text" id="search" placeholder="Filter samples  (e.g. DY, TT, QCD_HT)">
+  </div>
+  <button class="filter-btn" data-filter="all" onclick="setFilter('all')">All</button>
+  <button class="filter-btn" data-filter="filled" onclick="setFilter('filled')">Has xsec</button>
+  <button class="filter-btn" data-filter="pending" onclick="setFilter('pending')">Pending</button>
+  <span class="stat" id="stat"></span>
+</div>
+
+<div class="table-wrap">
+  <div class="loading" id="loading">
+    <div class="spinner"></div><br>Loading sample database…
+  </div>
+  <table id="table" style="display:none">
+    <thead>
+      <tr>
+        <th data-key="name">Sample <span class="sort-arrow">▲</span></th>
+        <th data-key="das_path">DAS Path <span class="sort-arrow">▲</span></th>
+        <th data-key="nevents">N events <span class="sort-arrow">▲</span></th>
+        <th data-key="nfiles">Files <span class="sort-arrow">▲</span></th>
+        <th data-key="cross_section_pb">σ [pb] <span class="sort-arrow">▲</span></th>
+        <th data-key="accuracy">Acc. <span class="sort-arrow">▲</span></th>
+        <th data-key="frac_neg_weight">f_neg <span class="sort-arrow">▲</span></th>
+        <th data-key="xsec_ref">Ref <span class="sort-arrow">▲</span></th>
+        <th style="cursor:default">Note</th>
+      </tr>
+    </thead>
+    <tbody id="tbody"></tbody>
+  </table>
+</div>
+
+<script>
+// ============================================================
+//  CONFIG — update this path after you push to GitHub
+// ============================================================
+// When serving via GitHub Pages, both index.html and data/ are
+// in the same repo, so a relative path works out of the box.
+const DATA_URL = "data/samples_2017UL.json";
+
+let allSamples = [];
+let currentFilter = "all";
+let sortKey   = "name";
+let sortAsc   = true;
+
+// ---- load ----
+fetch(DATA_URL)
+  .then(r => r.json())
+  .then(raw => {
+    allSamples = Object.entries(raw).map(([name, d]) => ({ name, ...d }));
+    document.getElementById("loading").style.display = "none";
+    document.getElementById("table").style.display = "";
+    const filled = allSamples.filter(s => s.cross_section_pb != null).length;
+    document.getElementById("badge").textContent = `${allSamples.length} samples`;
+    render();
+  })
+  .catch(err => {
+    document.getElementById("loading").innerHTML =
+      `<span style="color:var(--red)">Failed to load data.<br>${err.message}</span>`;
+  });
+
+// ---- render ----
+function render() {
+  const q = document.getElementById("search").value.toLowerCase();
+  let data = allSamples;
+
+  // text filter
+  if (q) data = data.filter(s => s.name.toLowerCase().includes(q) || s.das_path.toLowerCase().includes(q));
+
+  // category filter
+  if (currentFilter === "filled")  data = data.filter(s => s.cross_section_pb != null);
+  if (currentFilter === "pending") data = data.filter(s => s.cross_section_pb == null);
+
+  // sort
+  data.sort((a, b) => {
+    let va = a[sortKey], vb = b[sortKey];
+    if (va == null && vb == null) return 0;
+    if (va == null) return 1;
+    if (vb == null) return -1;
+    if (typeof va === "string") return sortAsc ? va.localeCompare(vb) : vb.localeCompare(va);
+    return sortAsc ? va - vb : vb - va;
+  });
+
+  const filled = data.filter(s => s.cross_section_pb != null).length;
+  document.getElementById("stat").textContent = `${data.length} shown · ${filled} with σ`;
+
+  const tbody = document.getElementById("tbody");
+  tbody.innerHTML = data.map(s => {
+    const xsec = s.cross_section_pb != null
+      ? `<td class="col-xsec">${fmtNum(s.cross_section_pb)}</td>`
+      : `<td class="col-xsec pending">—</td>`;
+    const nev = s.nevents != null
+      ? `<td class="col-num">${s.nevents.toLocaleString()}</td>`
+      : `<td class="col-num pending">—</td>`;
+    const nf = s.nfiles != null
+      ? `<td class="col-num">${s.nfiles}</td>`
+      : `<td class="col-num pending">—</td>`;
+    const fneg = s.frac_neg_weight != null
+      ? `<td class="col-num">${s.frac_neg_weight}</td>`
+      : `<td class="col-num pending">—</td>`;
+    const acc = s.accuracy ? `<td class="col-acc">${s.accuracy}</td>` : `<td class="col-acc pending">—</td>`;
+    const ref = s.xsec_ref && s.xsec_ref !== "--" ? `<td class="col-ref">${s.xsec_ref}</td>` : `<td class="col-ref pending">—</td>`;
+    const note = s.comment
+      ? `<td><span class="comment-icon">💬<span class="tooltip">${esc(s.comment)}</span></span></td>`
+      : `<td></td>`;
+    return `<tr>
+      <td class="col-name" title="${esc(s.name)}">${esc(s.name)}</td>
+      <td class="col-das" title="${esc(s.das_path)}">${esc(s.das_path)}</td>
+      ${nev}${nf}${xsec}${acc}${fneg}${ref}${note}
+    </tr>`;
+  }).join("");
+}
+
+// ---- helpers ----
+function fmtNum(v) {
+  if (v >= 1000) return v.toLocaleString(undefined, { maximumFractionDigits: 1 });
+  if (v >= 1)    return v.toFixed(2);
+  return v.toPrecision(4);
+}
+function esc(s) { const d = document.createElement("div"); d.textContent = s; return d.innerHTML; }
+
+// ---- events ----
+document.getElementById("search").addEventListener("input", render);
+
+function setFilter(f) {
+  currentFilter = f;
+  document.querySelectorAll(".filter-btn").forEach(b => b.classList.toggle("active", b.dataset.filter === f));
+  render();
+}
+setFilter("all");
+
+document.querySelectorAll("thead th[data-key]").forEach(th => {
+  th.addEventListener("click", () => {
+    const key = th.dataset.key;
+    if (sortKey === key) { sortAsc = !sortAsc; }
+    else { sortKey = key; sortAsc = true; }
+    document.querySelectorAll("thead th").forEach(h => h.classList.remove("sorted"));
+    th.classList.add("sorted");
+    th.querySelector(".sort-arrow").textContent = sortAsc ? "▲" : "▼";
+    render();
+  });
+});
+</script>
+</body>
+</html>
