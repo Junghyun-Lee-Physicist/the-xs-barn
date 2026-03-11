@@ -32,8 +32,6 @@
     min-height: 100vh;
     line-height: 1.5;
   }
-
-  /* ---- header ---- */
   .header {
     padding: 2.8rem 2rem 1.2rem;
     max-width: 1600px;
@@ -68,8 +66,6 @@
   }
   .badge-count { background: rgba(251,191,36,0.12); color: var(--amber); }
   .badge-ok    { background: rgba(34,197,94,0.12);  color: var(--green); }
-
-  /* ---- toolbar ---- */
   .toolbar {
     display: flex;
     gap: 0.75rem;
@@ -79,6 +75,23 @@
     max-width: 1600px;
     margin: 0 auto;
   }
+  .dataset-select {
+    padding: 0.55rem 2rem 0.55rem 1rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 0.8rem;
+    font-weight: 600;
+    outline: none;
+    cursor: pointer;
+    appearance: none;
+    background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="%236b7280" viewBox="0 0 16 16"><path d="M4.22 6.22a.75.75 0 0 1 1.06 0L8 8.94l2.72-2.72a.75.75 0 1 1 1.06 1.06l-3.25 3.25a.75.75 0 0 1-1.06 0L4.22 7.28a.75.75 0 0 1 0-1.06z"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 0.5rem center;
+  }
+  .dataset-select:focus { border-color: var(--accent); }
   .search-box {
     flex: 1;
     min-width: 200px;
@@ -107,7 +120,6 @@
   }
   .search-box input:focus { border-color: var(--accent); }
   .search-box input::placeholder { color: var(--text-dim); }
-
   .filter-btn {
     padding: 0.5rem 1rem;
     background: var(--surface);
@@ -121,15 +133,12 @@
   }
   .filter-btn:hover { border-color: var(--accent); color: var(--text); }
   .filter-btn.active { background: var(--accent-dim); border-color: var(--accent); color: #fff; }
-
   .stat {
     margin-left: auto;
     font-family: var(--mono);
     font-size: 0.72rem;
     color: var(--text-dim);
   }
-
-  /* ---- table ---- */
   .table-wrap {
     max-width: 1600px;
     margin: 0 auto;
@@ -156,14 +165,12 @@
   thead th:hover { color: var(--amber); }
   thead th .arr { margin-left: 0.3rem; opacity: 0.3; font-size: 0.6rem; }
   thead th.sorted .arr { opacity: 1; color: var(--amber); }
-
   tbody tr {
     border-bottom: 1px solid var(--border);
     transition: background 0.1s;
   }
   tbody tr:hover { background: var(--surface-2); }
   tbody td { padding: 0.5rem 0.6rem; vertical-align: top; white-space: nowrap; }
-
   .c-name {
     font-family: var(--mono); font-weight: 600; font-size: 0.74rem;
     color: #fbbf24; max-width: 340px; overflow: hidden; text-overflow: ellipsis;
@@ -171,13 +178,15 @@
   .c-das {
     font-family: var(--mono); font-size: 0.66rem; color: var(--text-dim);
     max-width: 500px; overflow: hidden; text-overflow: ellipsis;
+    cursor: pointer;
+    transition: color 0.15s;
   }
+  .c-das:hover { color: var(--amber); }
   .c-num { font-family: var(--mono); text-align: right; }
   .c-xsec { font-family: var(--mono); font-weight: 600; text-align: right; color: var(--green); }
   .c-tag  { font-family: var(--mono); font-size: 0.7rem; text-align: center; }
   .c-ref  { font-size: 0.7rem; text-align: center; }
   td.empty { color: var(--text-dim); font-style: italic; }
-
   .note-icon {
     display: inline-flex; align-items: center; justify-content: center;
     width: 20px; height: 20px; border-radius: 4px;
@@ -193,7 +202,6 @@
     z-index: 100; box-shadow: 0 8px 24px rgba(0,0,0,0.5);
   }
   .note-icon:hover .tip { display: block; }
-
   .loading {
     text-align: center; padding: 4rem 2rem;
     color: var(--text-dim); font-family: var(--mono);
@@ -205,22 +213,23 @@
     margin-bottom: 0.8rem;
   }
   @keyframes spin { to { transform: rotate(360deg); } }
-
   @media (max-width: 900px) {
     .header, .toolbar, .table-wrap { padding-left: 1rem; padding-right: 1rem; }
   }
 </style>
 </head>
 <body>
-
 <div class="header">
   <h1>The Barn</h1>
-  <span class="sub">CMS MC Sample Database — RunIISummer20UL17 NanoAODv9</span>
+  <span class="sub">CMS MC Sample Database</span>
   <span class="badge badge-count" id="badge-total"></span>
   <span class="badge badge-ok" id="badge-filled"></span>
 </div>
-
 <div class="toolbar">
+  <select id="dataset-select" class="dataset-select">
+    <option value="data/samples_2017UL.json">2017 UL (NanoAODv9)</option>
+    <option value="data/samples_2018UL.json">2018 UL (NanoAODv9)</option>
+  </select>
   <div class="search-box">
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
       <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
@@ -232,7 +241,6 @@
   <button class="filter-btn" data-f="pending" onclick="setFilter('pending')">Pending</button>
   <span class="stat" id="stat"></span>
 </div>
-
 <div class="table-wrap">
   <div class="loading" id="loading"><div class="spinner"></div><br>Loading…</div>
   <table id="tbl" style="display:none">
@@ -241,7 +249,7 @@
       <th data-k="das_path">DAS Path <span class="arr">▲</span></th>
       <th data-k="nevents">N events <span class="arr">▲</span></th>
       <th data-k="nfiles">Files <span class="arr">▲</span></th>
-      <th data-k="cross_section_pb">σ (pb) <span class="arr">▲</span></th>
+      <th data-k="cross_section_pb" style="text-transform: none;">σ (pb) <span class="arr">▲</span></th>
       <th data-k="accuracy">Acc. <span class="arr">▲</span></th>
       <th data-k="frac_neg_weight">f_neg <span class="arr">▲</span></th>
       <th data-k="xsec_ref">Ref <span class="arr">▲</span></th>
@@ -250,32 +258,40 @@
     <tbody id="tb"></tbody>
   </table>
 </div>
-
 <script>
-const DATA_URL = "data/samples_2017UL.json";
-
 let ALL = [], curFilter = "all", sKey = "name", sAsc = true;
-
-fetch(DATA_URL).then(r => r.json()).then(raw => {
-  ALL = Object.entries(raw).map(([n, d]) => ({ name: n, ...d }));
-  document.getElementById("loading").style.display = "none";
-  document.getElementById("tbl").style.display = "";
-  const filled = ALL.filter(s => s.cross_section_pb != null).length;
-  document.getElementById("badge-total").textContent  = `${ALL.length} samples`;
-  document.getElementById("badge-filled").textContent = `${filled} with σ`;
-  render();
-}).catch(e => {
-  document.getElementById("loading").innerHTML =
-    `<span style="color:var(--red)">Failed to load.<br>${e.message}</span>`;
+function loadDataset(url) {
+  document.getElementById("loading").style.display = "block";
+  document.getElementById("tbl").style.display = "none";
+  document.getElementById("tb").innerHTML = "";
+  fetch(url).then(r => {
+    if (!r.ok) throw new Error("Data file not found");
+    return r.json();
+  }).then(raw => {
+    ALL = Object.entries(raw).map(([n, d]) => ({ name: n, ...d }));
+    document.getElementById("loading").style.display = "none";
+    document.getElementById("tbl").style.display = "";
+    const filled = ALL.filter(s => s.cross_section_pb != null).length;
+    document.getElementById("badge-total").textContent  = `${ALL.length} samples`;
+    document.getElementById("badge-filled").textContent = `${filled} with σ`;
+    setFilter(curFilter);
+  }).catch(e => {
+    document.getElementById("loading").style.display = "block";
+    document.getElementById("loading").innerHTML =
+      `<span style="color:var(--red)">Failed to load data.<br>${e.message}<br>(해당 JSON 파일이 존재하는지 확인해주세요)</span>`;
+  });
+}
+document.getElementById("dataset-select").addEventListener("change", (e) => {
+  document.getElementById("loading").innerHTML = '<div class="spinner"></div><br>Loading…';
+  loadDataset(e.target.value);
 });
-
+loadDataset(document.getElementById("dataset-select").value);
 function render() {
   const q = document.getElementById("search").value.toLowerCase();
   let d = ALL;
   if (q) d = d.filter(s => s.name.toLowerCase().includes(q) || s.das_path.toLowerCase().includes(q));
   if (curFilter === "filled")  d = d.filter(s => s.cross_section_pb != null);
   if (curFilter === "pending") d = d.filter(s => s.cross_section_pb == null);
-
   d.sort((a, b) => {
     let va = a[sKey], vb = b[sKey];
     if (va == null && vb == null) return 0;
@@ -284,10 +300,8 @@ function render() {
     if (typeof va === "string") return sAsc ? va.localeCompare(vb) : vb.localeCompare(va);
     return sAsc ? va - vb : vb - va;
   });
-
   const filled = d.filter(s => s.cross_section_pb != null).length;
   document.getElementById("stat").textContent = `${d.length} shown · ${filled} with σ`;
-
   document.getElementById("tb").innerHTML = d.map(s => {
     const xs = s.cross_section_pb != null ? `<td class="c-xsec">${fN(s.cross_section_pb)}</td>` : `<td class="c-xsec empty">—</td>`;
     const ne = s.nevents != null ? `<td class="c-num">${s.nevents.toLocaleString()}</td>` : `<td class="c-num empty">—</td>`;
@@ -298,27 +312,22 @@ function render() {
     const nt = s.comment ? `<td><span class="note-icon">📝<span class="tip">${esc(s.comment)}</span></span></td>` : `<td></td>`;
     return `<tr>
       <td class="c-name" title="${esc(s.name)}">${esc(s.name)}</td>
-      <td class="c-das"  title="${esc(s.das_path)}">${esc(s.das_path)}</td>
+      <td class="c-das" title="클릭하면 das path를 클립보드에 복사합니다" onclick="navigator.clipboard.writeText('${s.das_path}'); alert('복사되었습니다:\\n${s.das_path}');">${esc(s.das_path)}</td>
       ${ne}${nf}${xs}${ac}${fn}${rf}${nt}</tr>`;
   }).join("");
 }
-
 function fN(v) {
   if (v >= 1000) return v.toLocaleString(undefined, { maximumFractionDigits: 1 });
   if (v >= 1)    return v.toFixed(2);
   return v.toPrecision(4);
 }
 function esc(s) { const d = document.createElement("div"); d.textContent = s; return d.innerHTML; }
-
 document.getElementById("search").addEventListener("input", render);
-
 function setFilter(f) {
   curFilter = f;
   document.querySelectorAll(".filter-btn").forEach(b => b.classList.toggle("active", b.dataset.f === f));
   render();
 }
-setFilter("all");
-
 document.querySelectorAll("thead th[data-k]").forEach(th => {
   th.addEventListener("click", () => {
     const k = th.dataset.k;
