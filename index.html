@@ -12,6 +12,7 @@
     --surface:    #14171e;
     --surface-2:  #1a1e28;
     --border:     #252a36;
+    --border-v:   #2a303c;
     --text:       #d4d8e3;
     --text-dim:   #6b7280;
     --accent:     #3b82f6;
@@ -23,8 +24,10 @@
     --sans:       'DM Sans', system-ui, sans-serif;
     --serif:      'Instrument Serif', Georgia, serif;
   }
+
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   html { font-size: 14px; }
+
   body {
     font-family: var(--sans);
     background: var(--bg);
@@ -32,6 +35,13 @@
     min-height: 100vh;
     line-height: 1.5;
   }
+
+  body.resizing {
+    cursor: col-resize !important;
+    user-select: none;
+  }
+
+  /* ── Header ── */
   .header {
     padding: 2.8rem 2rem 1.2rem;
     max-width: 1600px;
@@ -54,7 +64,7 @@
     align-items: baseline;
     gap: 0.5rem;
   }
-  .header h1 span.sub-title {
+  .header h1 .sub-title {
     font-family: var(--sans);
     font-size: 0.9rem;
     font-weight: 500;
@@ -68,6 +78,7 @@
     font-size: 0.82rem;
     font-family: var(--mono);
   }
+
   .badge {
     display: inline-block;
     font-family: var(--mono);
@@ -78,6 +89,15 @@
   }
   .badge-count { background: rgba(251,191,36,0.12); color: var(--amber); }
   .badge-ok    { background: rgba(34,197,94,0.12);  color: var(--green); }
+
+  .author {
+    margin-left: auto;
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    color: var(--text-dim);
+  }
+
+  /* ── Toolbar ── */
   .toolbar {
     display: flex;
     gap: 0.75rem;
@@ -87,6 +107,7 @@
     max-width: 1600px;
     margin: 0 auto;
   }
+
   .dataset-select {
     padding: 0.55rem 2rem 0.55rem 1rem;
     background: var(--surface);
@@ -104,6 +125,7 @@
     background-position: right 0.5rem center;
   }
   .dataset-select:focus { border-color: var(--accent); }
+
   .search-box {
     flex: 1;
     min-width: 200px;
@@ -132,6 +154,7 @@
   }
   .search-box input:focus { border-color: var(--accent); }
   .search-box input::placeholder { color: var(--text-dim); }
+
   .filter-btn {
     padding: 0.5rem 1rem;
     background: var(--surface);
@@ -145,19 +168,33 @@
   }
   .filter-btn:hover { border-color: var(--accent); color: var(--text); }
   .filter-btn.active { background: var(--accent-dim); border-color: var(--accent); color: #fff; }
+
   .stat {
     margin-left: auto;
     font-family: var(--mono);
     font-size: 0.72rem;
     color: var(--text-dim);
   }
+
+  /* ── Table ── */
   .table-wrap {
     max-width: 1600px;
     margin: 0 auto;
     padding: 0.5rem 2rem 3rem;
     overflow-x: auto;
   }
-  table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+
+  table {
+    border-collapse: collapse;
+    font-size: 0.8rem;
+    table-layout: fixed;
+    min-width: 100%;
+    width: max-content;
+  }
+
+  th, td { border-right: 1px solid var(--border-v); }
+  th:last-child, td:last-child { border-right: none; }
+
   thead th {
     position: sticky; top: 0; z-index: 10;
     background: var(--surface);
@@ -169,56 +206,39 @@
     letter-spacing: 0.06em;
     color: var(--text-dim);
     border-bottom: 2px solid var(--border);
-    cursor: pointer;
     user-select: none;
     white-space: nowrap;
     transition: color 0.15s;
   }
-  thead th:hover { color: var(--amber); }
+  thead th[data-k]:hover { color: var(--amber); }
   thead th .arr { margin-left: 0.3rem; opacity: 0.3; font-size: 0.6rem; }
   thead th.sorted .arr { opacity: 1; color: var(--amber); }
+
   tbody tr {
     border-bottom: 1px solid var(--border);
     transition: background 0.1s;
   }
   tbody tr:hover { background: var(--surface-2); }
-  tbody td { padding: 0.5rem 0.6rem; vertical-align: top; white-space: nowrap; }
-  
-  .resize-box {
-    resize: horizontal;
+
+  tbody td {
+    padding: 0.5rem 0.6rem;
+    vertical-align: top;
+    white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    white-space: nowrap;
-    display: block;
   }
-  .w-name {
-    width: 340px;
-    min-width: 150px;
-    max-width: 80vw;
-    font-family: var(--mono);
-    font-weight: 600;
-    font-size: 0.74rem;
-    color: #fbbf24;
-  }
-  .w-das {
-    width: 500px;
-    min-width: 200px;
-    max-width: 80vw;
-    font-family: var(--mono);
-    font-size: 0.66rem;
-    color: var(--text-dim);
-    cursor: pointer;
-    transition: color 0.15s;
-  }
-  .w-das:hover { color: var(--amber); }
-  
-  .c-num { font-family: var(--mono); text-align: right; }
-  .c-xsec { font-family: var(--mono); font-weight: 600; text-align: right; color: var(--green); }
-  .c-tag  { font-family: var(--mono); font-size: 0.7rem; text-align: center; }
-  .c-ref  { font-size: 0.7rem; text-align: center; }
+
+  .c-name  { font-family: var(--mono); font-weight: 600; font-size: 0.74rem; color: #fbbf24; }
+  .c-das   { font-family: var(--mono); font-size: 0.66rem; color: var(--text-dim); cursor: pointer; transition: color 0.15s; }
+  .c-das:hover { color: var(--amber); }
+  .c-num   { font-family: var(--mono); text-align: right; }
+  .c-xsec  { font-family: var(--mono); font-weight: 600; text-align: right; color: var(--green); }
+  .c-tag   { font-family: var(--mono); font-size: 0.7rem; text-align: center; }
+  .c-ref   { font-size: 0.7rem; text-align: center; }
   .c-ref a { color: var(--accent); text-decoration: underline; transition: color 0.15s; }
   .c-ref a:hover { color: #fff; }
   td.empty { color: var(--text-dim); font-style: italic; }
+
   .note-icon {
     display: inline-flex; align-items: center; justify-content: center;
     width: 20px; height: 20px; border-radius: 4px;
@@ -234,6 +254,8 @@
     z-index: 100; box-shadow: 0 8px 24px rgba(0,0,0,0.5);
   }
   .note-icon:hover .tip { display: block; }
+
+  /* ── Loading ── */
   .loading {
     text-align: center; padding: 4rem 2rem;
     color: var(--text-dim); font-family: var(--mono);
@@ -245,18 +267,68 @@
     margin-bottom: 0.8rem;
   }
   @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── Toast ── */
+  .toast-container {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    z-index: 10000;
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 0.5rem;
+    pointer-events: none;
+  }
+  .toast {
+    padding: 0.6rem 1.2rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--text);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    opacity: 0;
+    transform: translateY(8px);
+    animation: toast-in 0.25s ease forwards;
+    pointer-events: auto;
+  }
+  .toast.out {
+    animation: toast-out 0.2s ease forwards;
+  }
+  @keyframes toast-in {
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes toast-out {
+    to { opacity: 0; transform: translateY(8px); }
+  }
+
+  /* ── Resize guide line ── */
+  .drag-line {
+    display: none;
+    position: fixed;
+    top: 0; bottom: 0;
+    width: 2px;
+    background: var(--accent);
+    z-index: 9999;
+    pointer-events: none;
+  }
+
   @media (max-width: 900px) {
     .header, .toolbar, .table-wrap { padding-left: 1rem; padding-right: 1rem; }
   }
 </style>
 </head>
 <body>
+
 <div class="header">
   <h1>The Barn <span class="sub-title">cross section library</span></h1>
   <span class="sub">CMS MC Sample Database</span>
   <span class="badge badge-count" id="badge-total"></span>
   <span class="badge badge-ok" id="badge-filled"></span>
+  <div class="author">Author : junghyun-lee-physicist</div>
 </div>
+
 <div class="toolbar">
   <select id="dataset-select" class="dataset-select">
     <option value="data/samples_2017UL.json">2017 UL (NanoAODv9)</option>
@@ -268,117 +340,379 @@
     </svg>
     <input type="text" id="search" placeholder="Filter  (e.g. DY, TT, QCD_HT, powheg)">
   </div>
-  <button class="filter-btn" data-f="all"     onclick="setFilter('all')">All</button>
-  <button class="filter-btn" data-f="filled"  onclick="setFilter('filled')">Has σ</button>
-  <button class="filter-btn" data-f="pending" onclick="setFilter('pending')">Pending</button>
+  <button class="filter-btn active" data-f="all">All</button>
+  <button class="filter-btn" data-f="filled">Has σ</button>
+  <button class="filter-btn" data-f="pending">Pending</button>
   <span class="stat" id="stat"></span>
 </div>
+
 <div class="table-wrap">
   <div class="loading" id="loading"><div class="spinner"></div><br>Loading…</div>
   <table id="tbl" style="display:none">
     <thead><tr>
-      <th data-k="name">Sample <span class="arr">▲</span></th>
-      <th data-k="das_path">DAS Path <span class="arr">▲</span></th>
-      <th data-k="nevents">N events <span class="arr">▲</span></th>
-      <th data-k="nfiles">Files <span class="arr">▲</span></th>
-      <th data-k="cross_section_pb" style="text-transform: none;">σ (pb) <span class="arr">▲</span></th>
-      <th data-k="accuracy">Acc. <span class="arr">▲</span></th>
-      <th data-k="frac_neg_weight">f_neg <span class="arr">▲</span></th>
-      <th data-k="xsec_ref">Ref <span class="arr">▲</span></th>
-      <th style="cursor:default">Note</th>
+      <th data-k="name" style="width:320px">Sample <span class="arr">▲</span></th>
+      <th data-k="das_path" style="width:450px">DAS Path <span class="arr">▲</span></th>
+      <th data-k="nevents" style="width:110px">N events <span class="arr">▲</span></th>
+      <th data-k="nfiles" style="width:70px">Files <span class="arr">▲</span></th>
+      <th data-k="cross_section_pb" style="text-transform:none;width:90px">σ (pb) <span class="arr">▲</span></th>
+      <th data-k="accuracy" style="width:80px">Acc. <span class="arr">▲</span></th>
+      <th data-k="frac_neg_weight" style="width:80px">f_neg <span class="arr">▲</span></th>
+      <th data-k="xsec_ref" style="width:80px">Ref <span class="arr">▲</span></th>
+      <th style="width:60px">Note</th>
     </tr></thead>
     <tbody id="tb"></tbody>
   </table>
 </div>
+
+<div class="toast-container" id="toast-container"></div>
+<div class="drag-line" id="drag-line"></div>
+
 <script>
-let ALL = [], curFilter = "all", sKey = "name", sAsc = true;
-function loadDataset(url) {
-  document.getElementById("loading").style.display = "block";
-  document.getElementById("tbl").style.display = "none";
-  document.getElementById("tb").innerHTML = "";
-  fetch(url).then(r => {
-    if (!r.ok) throw new Error("Data file not found");
-    return r.json();
-  }).then(raw => {
-    ALL = Object.entries(raw).map(([n, d]) => ({ name: n, ...d }));
-    document.getElementById("loading").style.display = "none";
-    document.getElementById("tbl").style.display = "";
-    const filled = ALL.filter(s => s.cross_section_pb != null).length;
-    document.getElementById("badge-total").textContent  = `${ALL.length} samples`;
-    document.getElementById("badge-filled").textContent = `${filled} with σ`;
-    setFilter(curFilter);
-  }).catch(e => {
-    document.getElementById("loading").style.display = "block";
-    document.getElementById("loading").innerHTML =
-      `<span style="color:var(--red)">Failed to load data.<br>${e.message}<br>(해당 JSON 파일이 존재하는지 확인해주세요)</span>`;
-  });
-}
-document.getElementById("dataset-select").addEventListener("change", (e) => {
-  document.getElementById("loading").innerHTML = '<div class="spinner"></div><br>Loading…';
-  loadDataset(e.target.value);
-});
-loadDataset(document.getElementById("dataset-select").value);
-function render() {
-  const q = document.getElementById("search").value.toLowerCase();
-  let d = ALL;
-  if (q) d = d.filter(s => s.name.toLowerCase().includes(q) || s.das_path.toLowerCase().includes(q));
-  if (curFilter === "filled")  d = d.filter(s => s.cross_section_pb != null);
-  if (curFilter === "pending") d = d.filter(s => s.cross_section_pb == null);
-  d.sort((a, b) => {
-    let va = a[sKey], vb = b[sKey];
+;(function () {
+  'use strict';
+
+  /* ───────────────────────── DOM refs ───────────────────────── */
+  const $ = (sel) => document.querySelector(sel);
+  const $$ = (sel) => document.querySelectorAll(sel);
+
+  const dom = {
+    loading:   $('#loading'),
+    tbl:       $('#tbl'),
+    tbody:     $('#tb'),
+    search:    $('#search'),
+    stat:      $('#stat'),
+    badgeTotal:  $('#badge-total'),
+    badgeFilled: $('#badge-filled'),
+    datasetSel:  $('#dataset-select'),
+    toastBox:    $('#toast-container'),
+    dragLine:    $('#drag-line'),
+  };
+
+  /* ───────────────────────── State ──────────────────────────── */
+  let samples    = [];
+  let filtered   = [];
+  let curFilter  = 'all';
+  let sortKey    = 'name';
+  let sortAsc    = true;
+
+  /* ───────────────────────── Utilities ───────────────────────── */
+
+  /** Reusable element for HTML-escaping (avoids per-call allocation) */
+  const _escEl = document.createElement('span');
+  const esc = (s) => { _escEl.textContent = s ?? ''; return _escEl.innerHTML; };
+
+  /** Format a cross-section value for display */
+  const formatXsec = (v) => {
+    if (v >= 1000) return v.toLocaleString(undefined, { maximumFractionDigits: 1 });
+    if (v >= 1)    return v.toFixed(2);
+    return v.toPrecision(4);
+  };
+
+  /** Simple debounce */
+  const debounce = (fn, ms) => {
+    let timer;
+    return (...args) => {
+      clearTimeout(timer);
+      timer = setTimeout(() => fn(...args), ms);
+    };
+  };
+
+  /** Toast notification (replaces alert) */
+  const showToast = (msg, durationMs = 2200) => {
+    const el = document.createElement('div');
+    el.className = 'toast';
+    el.textContent = msg;
+    dom.toastBox.appendChild(el);
+    setTimeout(() => {
+      el.classList.add('out');
+      el.addEventListener('animationend', () => el.remove(), { once: true });
+    }, durationMs);
+  };
+
+  /* ───────────────────────── Data loading ───────────────────── */
+
+  const loadDataset = async (url) => {
+    dom.loading.style.display = 'block';
+    dom.loading.innerHTML = '<div class="spinner"></div><br>Loading…';
+    dom.tbl.style.display = 'none';
+    dom.tbody.innerHTML = '';
+
+    try {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+      const raw = await res.json();
+      samples = Object.entries(raw).map(([name, data]) => ({ name, ...data }));
+
+      const filledCount = samples.reduce((n, s) => n + (s.cross_section_pb != null ? 1 : 0), 0);
+      dom.badgeTotal.textContent  = `${samples.length} samples`;
+      dom.badgeFilled.textContent = `${filledCount} with σ`;
+
+      dom.loading.style.display = 'none';
+      dom.tbl.style.display = '';
+      applyFilterAndRender();
+    } catch (err) {
+      dom.loading.innerHTML =
+        `<span style="color:var(--red)">Failed to load data.<br>${esc(err.message)}<br>(해당 JSON 파일이 존재하는지 확인해주세요)</span>`;
+    }
+  };
+
+  /* ───────────────────────── Filter / Sort / Render ─────────── */
+
+  const compare = (a, b) => {
+    const va = a[sortKey], vb = b[sortKey];
     if (va == null && vb == null) return 0;
     if (va == null) return 1;
     if (vb == null) return -1;
-    if (typeof va === "string") return sAsc ? va.localeCompare(vb) : vb.localeCompare(va);
-    return sAsc ? va - vb : vb - va;
-  });
-  const filled = d.filter(s => s.cross_section_pb != null).length;
-  document.getElementById("stat").textContent = `${d.length} shown · ${filled} with σ`;
-  document.getElementById("tb").innerHTML = d.map(s => {
-    const xs = s.cross_section_pb != null ? `<td class="c-xsec">${fN(s.cross_section_pb)}</td>` : `<td class="c-xsec empty">—</td>`;
-    const ne = s.nevents != null ? `<td class="c-num">${s.nevents.toLocaleString()}</td>` : `<td class="c-num empty">—</td>`;
-    const nf = s.nfiles  != null ? `<td class="c-num">${s.nfiles}</td>` : `<td class="c-num empty">—</td>`;
-    const fn = s.frac_neg_weight != null ? `<td class="c-num">${s.frac_neg_weight}</td>` : `<td class="c-num empty">—</td>`;
-    const ac = s.accuracy ? `<td class="c-tag">${s.accuracy}</td>` : `<td class="c-tag empty">—</td>`;
-    
-    let rf = `<td class="c-ref empty">—</td>`;
-    if (s.xsec_ref && s.xsec_ref !== "--") {
-      if (s.Ref_link) {
-        rf = `<td class="c-ref"><a href="${s.Ref_link}" target="_blank">${s.xsec_ref}</a></td>`;
-      } else {
-        rf = `<td class="c-ref">${s.xsec_ref}</td>`;
-      }
+    if (typeof va === 'string') return sortAsc ? va.localeCompare(vb) : vb.localeCompare(va);
+    return sortAsc ? va - vb : vb - va;
+  };
+
+  const applyFilterAndRender = () => {
+    const query = dom.search.value.toLowerCase();
+
+    filtered = samples;
+
+    if (query) {
+      filtered = filtered.filter(s =>
+        s.name.toLowerCase().includes(query) ||
+        s.das_path.toLowerCase().includes(query)
+      );
     }
-    
-    const nt = s.comment ? `<td><span class="note-icon">📝<span class="tip">${esc(s.comment)}</span></span></td>` : `<td></td>`;
-    return `<tr>
-      <td><div class="resize-box w-name" title="${esc(s.name)}">${esc(s.name)}</div></td>
-      <td><div class="resize-box w-das" title="클릭하면 das path를 클립보드에 복사합니다" onclick="navigator.clipboard.writeText('${s.das_path}'); alert('복사되었습니다:\\n${s.das_path}');">${esc(s.das_path)}</div></td>
-      ${ne}${nf}${xs}${ac}${fn}${rf}${nt}</tr>`;
-  }).join("");
-}
-function fN(v) {
-  if (v >= 1000) return v.toLocaleString(undefined, { maximumFractionDigits: 1 });
-  if (v >= 1)    return v.toFixed(2);
-  return v.toPrecision(4);
-}
-function esc(s) { const d = document.createElement("div"); d.textContent = s; return d.innerHTML; }
-document.getElementById("search").addEventListener("input", render);
-function setFilter(f) {
-  curFilter = f;
-  document.querySelectorAll(".filter-btn").forEach(b => b.classList.toggle("active", b.dataset.f === f));
-  render();
-}
-document.querySelectorAll("thead th[data-k]").forEach(th => {
-  th.addEventListener("click", () => {
-    const k = th.dataset.k;
-    if (sKey === k) sAsc = !sAsc; else { sKey = k; sAsc = true; }
-    document.querySelectorAll("thead th").forEach(h => h.classList.remove("sorted"));
-    th.classList.add("sorted");
-    th.querySelector(".arr").textContent = sAsc ? "▲" : "▼";
-    render();
+    if (curFilter === 'filled')  filtered = filtered.filter(s => s.cross_section_pb != null);
+    if (curFilter === 'pending') filtered = filtered.filter(s => s.cross_section_pb == null);
+
+    filtered.sort(compare);
+
+    const filledShown = filtered.reduce((n, s) => n + (s.cross_section_pb != null ? 1 : 0), 0);
+    dom.stat.textContent = `${filtered.length} shown · ${filledShown} with σ`;
+
+    renderRows(filtered);
+  };
+
+  /**
+   * Build rows via DocumentFragment + createElement (no innerHTML per row).
+   * Keeps DAS paths in data attributes — eliminates XSS from inline handlers.
+   */
+  const renderRows = (data) => {
+    const frag = document.createDocumentFragment();
+
+    for (let i = 0, len = data.length; i < len; i++) {
+      const s  = data[i];
+      const tr = document.createElement('tr');
+
+      // ── Sample name ──
+      const tdName = document.createElement('td');
+      tdName.className = 'c-name';
+      tdName.title = s.name;
+      tdName.textContent = s.name;
+      tr.appendChild(tdName);
+
+      // ── DAS path (click-to-copy via delegation) ──
+      const tdDas = document.createElement('td');
+      tdDas.className = 'c-das';
+      tdDas.title = '클릭하면 DAS path를 클립보드에 복사합니다';
+      tdDas.dataset.path = s.das_path;
+      tdDas.textContent = s.das_path;
+      tr.appendChild(tdDas);
+
+      // ── N events ──
+      appendCell(tr, s.nevents != null ? s.nevents.toLocaleString() : null, 'c-num');
+
+      // ── Files ──
+      appendCell(tr, s.nfiles != null ? String(s.nfiles) : null, 'c-num');
+
+      // ── Cross section ──
+      appendCell(tr, s.cross_section_pb != null ? formatXsec(s.cross_section_pb) : null, 'c-xsec');
+
+      // ── Accuracy ──
+      appendCell(tr, s.accuracy || null, 'c-tag');
+
+      // ── f_neg ──
+      appendCell(tr, s.frac_neg_weight != null ? String(s.frac_neg_weight) : null, 'c-num');
+
+      // ── Ref ──
+      const tdRef = document.createElement('td');
+      tdRef.className = 'c-ref';
+      if (s.xsec_ref && s.xsec_ref !== '--') {
+        if (s.Ref_link) {
+          const a = document.createElement('a');
+          a.href = s.Ref_link;
+          a.target = '_blank';
+          a.rel = 'noopener';
+          a.textContent = s.xsec_ref;
+          tdRef.appendChild(a);
+        } else {
+          tdRef.textContent = s.xsec_ref;
+        }
+      } else {
+        tdRef.classList.add('empty');
+        tdRef.textContent = '—';
+      }
+      tr.appendChild(tdRef);
+
+      // ── Note ──
+      const tdNote = document.createElement('td');
+      if (s.comment) {
+        const icon = document.createElement('span');
+        icon.className = 'note-icon';
+        icon.textContent = '📝';
+        const tip = document.createElement('span');
+        tip.className = 'tip';
+        tip.textContent = s.comment;
+        icon.appendChild(tip);
+        tdNote.appendChild(icon);
+      }
+      tr.appendChild(tdNote);
+
+      frag.appendChild(tr);
+    }
+
+    dom.tbody.innerHTML = '';
+    dom.tbody.appendChild(frag);
+  };
+
+  /** Helper: append a simple text cell */
+  const appendCell = (tr, value, cls) => {
+    const td = document.createElement('td');
+    td.className = cls;
+    if (value != null) {
+      td.textContent = value;
+    } else {
+      td.classList.add('empty');
+      td.textContent = '—';
+    }
+    tr.appendChild(td);
+  };
+
+  /* ───────────────────────── Event: Dataset select ──────────── */
+
+  dom.datasetSel.addEventListener('change', (e) => loadDataset(e.target.value));
+
+  /* ───────────────────────── Event: Search (debounced) ───────── */
+
+  dom.search.addEventListener('input', debounce(applyFilterAndRender, 150));
+
+  /* ───────────────────────── Event: Filter buttons ──────────── */
+
+  document.querySelector('.toolbar').addEventListener('click', (e) => {
+    const btn = e.target.closest('.filter-btn');
+    if (!btn) return;
+    curFilter = btn.dataset.f;
+    $$('.filter-btn').forEach(b => b.classList.toggle('active', b.dataset.f === curFilter));
+    applyFilterAndRender();
   });
-});
+
+  /* ───────────────────────── Event: DAS path copy (delegation) ─ */
+
+  dom.tbody.addEventListener('click', (e) => {
+    const td = e.target.closest('.c-das');
+    if (!td) return;
+    const path = td.dataset.path;
+    if (!path) return;
+
+    navigator.clipboard.writeText(path).then(
+      () => showToast(`복사되었습니다: ${path}`),
+      () => showToast('복사에 실패했습니다')
+    );
+  });
+
+  /* ───────────────────────── Event: Column sorting ──────────── */
+
+  let resizeDragged = false;
+
+  dom.tbl.querySelector('thead').addEventListener('click', (e) => {
+    if (resizeDragged) return;
+    const th = e.target.closest('th[data-k]');
+    if (!th) return;
+
+    // Ignore clicks on the resize edge
+    const rect = th.getBoundingClientRect();
+    if (rect.right - e.clientX <= 8) return;
+
+    const key = th.dataset.k;
+    if (sortKey === key) {
+      sortAsc = !sortAsc;
+    } else {
+      sortKey = key;
+      sortAsc = true;
+    }
+
+    $$('thead th').forEach(h => h.classList.remove('sorted'));
+    th.classList.add('sorted');
+    th.querySelector('.arr').textContent = sortAsc ? '▲' : '▼';
+
+    applyFilterAndRender();
+  });
+
+  /* ───────────────────────── Column resize (rAF optimised) ──── */
+
+  let isResizing = false;
+  let resizeTh   = null;
+  let resizeStartX = 0;
+  let resizeStartW = 0;
+  let rafId = 0;
+
+  const onResizeMove = (e) => {
+    if (!isResizing) return;
+    resizeDragged = true;
+    cancelAnimationFrame(rafId);
+    rafId = requestAnimationFrame(() => {
+      const newW = Math.max(40, resizeStartW + (e.clientX - resizeStartX));
+      resizeTh.style.width = `${newW}px`;
+      dom.dragLine.style.left = `${e.clientX}px`;
+    });
+  };
+
+  const onResizeEnd = () => {
+    if (!isResizing) return;
+    isResizing = false;
+    cancelAnimationFrame(rafId);
+    document.body.classList.remove('resizing');
+    dom.dragLine.style.display = 'none';
+    resizeTh = null;
+    setTimeout(() => { resizeDragged = false; }, 50);
+  };
+
+  // Cursor hint on hover near right edge
+  dom.tbl.addEventListener('mousemove', (e) => {
+    if (isResizing) return;
+    const cell = e.target.closest('th, td');
+    if (!cell || !cell.nextElementSibling) return;
+    const rect = cell.getBoundingClientRect();
+    cell.style.cursor = (rect.right - e.clientX <= 8) ? 'col-resize'
+                        : (cell.tagName === 'TH' ? 'pointer' : '');
+  });
+
+  dom.tbl.addEventListener('mousedown', (e) => {
+    const cell = e.target.closest('th, td');
+    if (!cell || !cell.nextElementSibling) return;
+    const rect = cell.getBoundingClientRect();
+    if (rect.right - e.clientX > 8) return;
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    const colIdx = Array.from(cell.parentNode.children).indexOf(cell);
+    resizeTh     = dom.tbl.querySelector('thead').querySelectorAll('th')[colIdx];
+    resizeStartX = e.clientX;
+    resizeStartW = resizeTh.offsetWidth;
+    isResizing   = true;
+    resizeDragged = false;
+
+    document.body.classList.add('resizing');
+    dom.dragLine.style.display = 'block';
+    dom.dragLine.style.left = `${e.clientX}px`;
+  });
+
+  document.addEventListener('mousemove', onResizeMove);
+  document.addEventListener('mouseup', onResizeEnd);
+
+  /* ───────────────────────── Init ───────────────────────────── */
+
+  loadDataset(dom.datasetSel.value);
+
+})();
 </script>
 </body>
 </html>
